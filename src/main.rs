@@ -32,6 +32,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         err
     })?;
 
+    let _queues_setup = publisher
+        .setup_queues("organization-1", &["email", "sms", "push"])
+        .await
+        .map_err(|err| {
+            error!("Failed to setup queues: {}", err);
+            err
+        })?;
+
     info!("RabbitMQ publisher inited");
 
     let app = create_router(publisher).layer(TraceLayer::new_for_http());
@@ -42,12 +50,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await
         .expect("Failed to bind listener");
 
+    info!("Server started on port {}", config.port);
+
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await
         .unwrap();
-
-    info!("Server started on port {}", config.port);
 
     Ok(())
 }
