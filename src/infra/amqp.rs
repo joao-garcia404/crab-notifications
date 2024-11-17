@@ -14,8 +14,8 @@ static CHANNEL: OnceCell<Arc<Channel>> = OnceCell::const_new();
 
 #[derive(Clone)]
 pub struct AmqpPublisher {
-    exchange: String,
-    channel: Arc<Channel>,
+    pub exchange: String,
+    pub channel: Arc<Channel>,
 }
 
 impl AmqpPublisher {
@@ -78,7 +78,7 @@ impl AmqpPublisher {
     ) -> Result<(), Box<dyn std::error::Error>> {
         for notification_type in notification_types {
             let queue_name = format!("{}.{}", org_id, notification_type);
-            let routing_key = format!("{}.{}#", org_id, notification_type);
+            let routing_key = format!("{}.{}", org_id, notification_type);
 
             self.channel
                 .queue_declare(QueueDeclareArguments::new(&queue_name))
