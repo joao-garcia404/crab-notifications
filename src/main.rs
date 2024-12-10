@@ -42,6 +42,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("RabbitMQ publisher inited");
 
+    tokio::spawn(async move {
+        info!("Starting consumers");
+
+        let _ = infra::consumer::start_consumers(&config)
+            .await
+            .map_err(|err| {
+                error!("Failed to start consumers: {}", err);
+                std::process::exit(1);
+            });
+
+        info!("Consumers started");
+    });
+
     let app = create_router(publisher).layer(TraceLayer::new_for_http());
 
     let listener_address = format!("0.0.0.0:{}", config.port);
