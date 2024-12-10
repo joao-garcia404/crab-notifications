@@ -14,18 +14,16 @@ pub struct EmailNotification {
     pub template_id: String,
     pub recipient: String,
     pub subject: String,
-    pub body: String,
     pub created_at: String,
 }
 
 impl EmailNotification {
-    pub fn new(template_id: String, recipient: String, subject: String, body: String) -> Self {
+    pub fn new(template_id: String, recipient: String, subject: String) -> Self {
         Self {
             id: Uuid::new_v4().to_string(),
             template_id,
             recipient,
             subject,
-            body,
             created_at: Utc::now().to_rfc3339(),
         }
     }

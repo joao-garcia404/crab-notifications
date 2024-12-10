@@ -43,7 +43,6 @@ pub async fn create_email_notification(
         payload
             .subject
             .unwrap_or_else(|| "Notification".to_string()),
-        "<p>Account created!</p>".to_string(),
     );
 
     let json_content = notification.into_json_string().map_err(|err| {
