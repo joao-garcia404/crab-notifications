@@ -1,20 +1,20 @@
+use std::sync::Arc;
+
 use crate::infra::amqp::AmqpConsumer;
+use crate::tracing::{error, info};
+use crate::workers::email::EmailWorker;
+
 use amqprs::BasicProperties;
 use amqprs::Deliver;
-use tracing::info;
+use thiserror::Error;
 
-pub async fn handle_email_notification(
-    _deliver: Deliver,
-    _properties: BasicProperties,
-    content: Vec<u8>,
-) -> Result<(), Box<dyn std::error::Error + Send>> {
-    info!(
-        "Handling email notification: {:?}",
-        String::from_utf8(content)
-    );
+#[derive(Error, Debug)]
+pub enum ConsumerError {
+    #[error("Failed to decode notification")]
+    DecodeError,
 
-    // Process email notification
-    Ok(())
+    #[error("Failed to parse notification")]
+    ParseError,
 }
 
 pub async fn handle_sms_notification(
@@ -55,48 +55,20 @@ pub async fn start_consumers(
     )
     .await?;
 
-    // Will be added soon
-
-    // let sms_consumer = AmqpConsumer::new(
-    //     &config.rabbitmq_host,
-    //     config.rabbitmq_port,
-    //     &config.rabbitmq_user,
-    //     &config.rabbitmq_password,
-    //     "organization-1.sms",
-    // )
-    // .await?;
-
-    // let push_consumer = AmqpConsumer::new(
-    //     &config.rabbitmq_host,
-    //     config.rabbitmq_port,
-    //     &config.rabbitmq_user,
-    //     &config.rabbitmq_password,
-    //     "organization-1.push",
-    // )
-    // .await?;
-
     tokio::spawn(async move {
-        email_consumer
-            .consume("email_consumer", handle_email_notification)
-            .await
-            .unwrap();
+        let worker = Arc::new(EmailWorker::new());
+
+        let consumer = email_consumer
+            .consume("email_consumer", move |d, p, c| {
+                let worker = Arc::clone(&worker);
+                async move { worker.handle(d, p, c).await }
+            })
+            .await;
+
+        if let Err(err) = consumer {
+            error!("Failed to start email consumer: {:?}", err);
+        }
     });
-
-    // Will be added soon
-
-    // tokio::spawn(async move {
-    //     sms_consumer
-    //         .consume("sms_consumer", handle_sms_notification)
-    //         .await
-    //         .unwrap();
-    // });
-
-    // tokio::spawn(async move {
-    //     push_consumer
-    //         .consume("push_consumer", handle_push_notification)
-    //         .await
-    //         .unwrap();
-    // });
 
     Ok(())
 }

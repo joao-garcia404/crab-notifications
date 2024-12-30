@@ -1,0 +1,5 @@
+{
+  "id": "org1-created-account",
+  "subject": "Welcome to our platform",
+  "body": "<p>Hi {{username}},</p><p>Your account has been created successfully.</p><p>Thank you for joining us.</p>"
+}
