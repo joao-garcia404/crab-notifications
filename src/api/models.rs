@@ -9,7 +9,6 @@ pub struct CreateEmailNotificationRequest {
     pub recipient: String,
     #[validate(length(min = 1, message = "Template ID is required"))]
     pub template_id: String,
-    pub subject: Option<String>,
     pub metadata: serde_json::Value,
 }
 

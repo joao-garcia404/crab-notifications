@@ -9,7 +9,9 @@ pub mod api;
 pub mod config;
 pub mod domain;
 pub mod infra;
+pub mod templates;
 pub mod tracing;
+pub mod workers;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -4,7 +4,9 @@ use tracing::{info, warn};
 use validator::Validate;
 
 use crate::{
-    api::errors::HttpError, domain::notification::EmailNotification, infra::amqp::AmqpPublisher,
+    api::errors::HttpError,
+    domain::notification::{EmailNotification, Notification},
+    infra::amqp::AmqpPublisher,
 };
 
 use super::{
@@ -35,15 +37,8 @@ pub async fn create_email_notification(
 
     info!("Email notification payload: {:?}", payload);
 
-    // Find the email template and inject custom variables.
-
-    let notification = EmailNotification::new(
-        payload.recipient,
-        payload.template_id,
-        payload
-            .subject
-            .unwrap_or_else(|| "Notification".to_string()),
-    );
+    let notification =
+        EmailNotification::new(payload.template_id, payload.recipient, payload.metadata);
 
     let json_content = notification.into_json_string().map_err(|err| {
         warn!("Failed to serialize email notification: {:?}", err);
@@ -78,6 +73,6 @@ pub async fn create_email_notification(
     info!("Email notification published successfully");
 
     Ok(Json(CreateNotificationResponse {
-        id: "123".to_string(),
+        id: notification.id,
     }))
 }
