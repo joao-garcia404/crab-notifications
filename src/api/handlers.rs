@@ -37,8 +37,6 @@ pub async fn create_email_notification(
 
     info!("Email notification payload: {:?}", payload);
 
-    // Find the email template and inject custom variables.
-
     let notification =
         EmailNotification::new(payload.template_id, payload.recipient, payload.metadata);
 
@@ -75,6 +73,6 @@ pub async fn create_email_notification(
     info!("Email notification published successfully");
 
     Ok(Json(CreateNotificationResponse {
-        id: "123".to_string(),
+        id: notification.id,
     }))
 }

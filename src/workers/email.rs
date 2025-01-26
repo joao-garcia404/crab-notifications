@@ -68,13 +68,13 @@ impl EmailWorker {
             .engine
             .render(&template, &notification.metadata)
             .map_err(|err| {
-                error!("Failed to render email notification: {:?}", err);
+                error!("Failed to render email html: {:?}", err);
                 Box::new(ConsumerError::ParseError) as Box<dyn std::error::Error + Send>
             })?;
 
         info!("Rendered email notification: {:?}", rendered);
 
-        let from = "Crab <onboarding@resend.dev>";
+        let from = "Crab Notifications <onboarding@resend.dev>"; // Local development e-mail source
         let to = [notification.recipient];
         let subject = template.subject;
         let email = CreateEmailBaseOptions::new(from, to, subject).with_html(&rendered);
