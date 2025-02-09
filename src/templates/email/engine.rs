@@ -7,6 +7,12 @@ pub struct EmailTemplateEngine {
     handlebars: Handlebars<'static>,
 }
 
+impl Default for EmailTemplateEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl EmailTemplateEngine {
     pub fn new() -> Self {
         Self {

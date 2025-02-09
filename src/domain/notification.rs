@@ -10,7 +10,7 @@ pub enum NotificationError {
 }
 
 pub trait Notification: Serialize + for<'de> Deserialize<'de> {
-    fn into_json_string(&self) -> Result<String, NotificationError> {
+    fn to_json_string(&self) -> Result<String, NotificationError> {
         let json_content = serde_json::to_string(&self);
 
         json_content.map_err(|err| err.into())
