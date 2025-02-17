@@ -34,7 +34,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         err
     })?;
 
-    let _queues_setup = publisher
+    publisher
         .setup_queues("organization-1", &["email", "sms", "push"])
         .await
         .map_err(|err| {
@@ -47,7 +47,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tokio::spawn(async move {
         info!("Starting consumers");
 
-        let _ = infra::consumer::start_consumers(&config)
+        let _ = infra::consumer::start_consumers(config)
             .await
             .map_err(|err| {
                 error!("Failed to start consumers: {}", err);

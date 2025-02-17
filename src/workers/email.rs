@@ -19,6 +19,12 @@ pub struct EmailWorker {
     resend: Arc<Resend>,
 }
 
+impl Default for EmailWorker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl EmailWorker {
     pub fn new() -> Self {
         let repository = Arc::new(FileEmailTemplateRepository::new("templates".to_string()));

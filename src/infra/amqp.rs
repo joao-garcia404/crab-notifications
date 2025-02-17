@@ -184,7 +184,7 @@ impl AmqpConsumer {
             + Send
             + 'static,
     {
-        let args = BasicConsumeArguments::new(&self.queue, &consumer_tag)
+        let args = BasicConsumeArguments::new(&self.queue, consumer_tag)
             .manual_ack(true)
             .finish();
 

@@ -18,16 +18,16 @@ pub async fn create_email_notification(
     State(publisher): State<AmqpPublisher>,
     Json(payload): Json<CreateEmailNotificationRequest>,
 ) -> Result<HttpResponse<CreateNotificationResponse>, HttpError> {
-    let _validation_result = payload.validate().map_err(|err| {
+    payload.validate().map_err(|err| {
         warn!(
             "Invalid email notification request payload: {:?}, error: {:?}",
             payload, err
         );
 
-        return HttpError {
+        HttpError {
             status_code: StatusCode::BAD_REQUEST,
             message: format!("Invalid payload: {}", err),
-        };
+        }
     })?;
 
     info!(
@@ -40,7 +40,7 @@ pub async fn create_email_notification(
     let notification =
         EmailNotification::new(payload.template_id, payload.recipient, payload.metadata);
 
-    let json_content = notification.into_json_string().map_err(|err| {
+    let json_content = notification.to_json_string().map_err(|err| {
         warn!("Failed to serialize email notification: {:?}", err);
 
         HttpError {
